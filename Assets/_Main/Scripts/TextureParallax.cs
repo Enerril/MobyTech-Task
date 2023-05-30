@@ -1,24 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
 public class TextureParallax : MonoBehaviour
 {
-    Material mat;
-    float distance;
-
-    [SerializeField] float speed;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        mat = GetComponent<Material>();
-    }
+    [SerializeField] RawImage _rawImage;
+    [SerializeField] CameraFollower _cameraFollower;
+    [SerializeField] float horizontalSpeed=0f, verticalSpeed=0f;
+    [SerializeField] float mult=1f;
+    float parallaxSpeed;
 
     // Update is called once per frame
     void Update()
     {
-        distance = Time.deltaTime*speed;
-        mat.SetTextureOffset("_MainTex", Vector2.right * distance);
+        parallaxSpeed = _cameraFollower.CurrentSpeed *(1+ horizontalSpeed);
+        Vector2 newPos = new Vector2(parallaxSpeed, verticalSpeed) * mult * Time.deltaTime;
+        _rawImage.uvRect = new Rect(_rawImage.uvRect.position + newPos,_rawImage.uvRect.size);
+        
     }
 }

@@ -5,9 +5,10 @@ using UnityEngine;
 public class LevelData : MonoBehaviour
 {
     // each level has endpoint and coverPoint preset and camera look pos
+    // also enemy spawnpoints.
     [field:SerializeField] public Transform EndPoint { get; private set; }
     [field: SerializeField] public Transform CameraLookPos { get; private set; }
-
+    [field: SerializeField] public Transform[] enemySpawnPoints { get; private set; }
     [SerializeField] public GameObject coverGameobject;
 
 
