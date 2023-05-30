@@ -19,7 +19,7 @@ public class LevelData : MonoBehaviour
         var l = coverGameobject.transform.position + new Vector3(0, 0, -.5f);
         //CoverPoint = transform.TransformPoint(CoverPoint);
         CoverPoint = l;
-        Debug.Log("LEVELDATA " + CoverPoint);
+        //Debug.Log("LEVELDATA " + CoverPoint);
     }
 
 

@@ -23,9 +23,9 @@ public class PlayerController : MonoBehaviour
     
     bool _onPosition;
     bool _onTheMove;
-
+    bool _reachedCoverPointFirstTime;
     GameObject proj;
-
+    float reloadTime;
     private void Awake()
     {
         //
@@ -37,6 +37,21 @@ public class PlayerController : MonoBehaviour
         // OnPassedEndpoint += lala;
         _camera = Camera.main;
         _coverPoint = levelManager.GetCoverPosition();
+        levelManager.OnLevelCompleted += ProceedToNextLevel;
+    }
+
+    private void ProceedToNextLevel(object sender, EventArgs e)
+    {
+        // change coverpoint
+        StartCoroutine(ResetBools());
+        _coverPoint = levelManager.GetCoverPosition();
+    }
+
+    IEnumerator ResetBools()
+    {
+        yield return new WaitForSeconds(.5f);
+        _reachedCoverPointFirstTime = false;
+        _onPosition = false;
     }
 
     // Update is called once per frame
@@ -46,8 +61,14 @@ public class PlayerController : MonoBehaviour
         if (Vector3.Distance(transform.position, _coverPoint) < 0.1f && !_onPosition)
         {
             // have level manager subscribe and spawn another level, then feed back patrol point.
-            OnReachedCoverPos?.Invoke(this, EventArgs.Empty);
-            _onPosition = true;
+            if (!_reachedCoverPointFirstTime)
+            {
+                Debug.Log("PLAYER REACHED COVER");
+                OnReachedCoverPos?.Invoke(this, EventArgs.Empty);
+
+            }
+                _onPosition = true;
+            _reachedCoverPointFirstTime = true;
         }
 
 
@@ -64,20 +85,42 @@ public class PlayerController : MonoBehaviour
     }
     private void Update()
     {
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0) && reloadTime>0.5f)
         {
             Vector3 pos=new Vector3();
             Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
             
             if(Physics.Raycast(ray, out RaycastHit raycastHit))
             {
-                pos = raycastHit.point;
-                proj = Instantiate(_projectile, transform.position, Quaternion.identity);
-                proj.transform.LookAt(pos);
+
+                if (_reachedCoverPointFirstTime)
+                {
+                    transform.position += new Vector3(1, 0, 0);
+                    _onPosition = false;
+                    pos = raycastHit.point;
+                    proj = Instantiate(_projectile, transform.position + new Vector3(0, .5f, 0), Quaternion.identity);
+                    proj.transform.LookAt(pos);
+                    reloadTime = 0;
+                }
+                else
+                {
+                    
+                    pos = raycastHit.point;
+                    proj = Instantiate(_projectile, transform.position + new Vector3(0, .5f, 0), Quaternion.identity);
+                    proj.transform.LookAt(pos);
+                    reloadTime = 0;
+                }
+
+
+
             }
+          
 
                       
         }
+
+        reloadTime += Time.deltaTime;
+        if (reloadTime > 100) reloadTime = 0;
     }
 
 
